@@ -1,0 +1,32 @@
+# Composer dependencies
+/vendor/
+composer.lock
+
+# PHPUnit
+/phpunit.xml.cache
+/.phpunit.result.cache
+/.phpunit.cache/
+
+# Coverage reports
+/coverage/
+/clover.xml
+/junit.xml
+
+# IDE & Editor
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+*.log
+*.tmp
+
+# Cache
+.cache/
