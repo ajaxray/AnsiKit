@@ -20,6 +20,7 @@ Works any terminal that supports ANSI escapes (most modern terminals on macOS/Li
 ## Features
 
 - Colors: Foreground and background colors - standard 8/16 colors, 256-color, and truecolor (RGB, 24-bit)
+- Text styles: bold, dim, italic, underline, inverse, hidden, strike-through
 - Cursor control: movement, save/restore, show/hide, alternate screen buffer
 - Components: Table, Banner, Progressbar, Spinner
 - Writers: swap output target (stdout or in-memory for tests)
@@ -176,6 +177,23 @@ php examples/input.php      # interactive input demo
 - Windows 10+: use Windows Terminal, ConEmu, or enable VT processing for best ANSI support
 - Use monospaced fonts for best alignment of box-drawing characters
 - Emoji width can vary by terminal; table/banner widths are based on naive visible length
+
+## Additional Resources
+
+This library help with rendering basic terminal UIs with styles, colors, and cursor control. 
+For more complex TUIs and interactive apps, you may use:
+
+- Parsing options and flags: 
+  - For simpler apps, [$argv](https://www.php.net/manual/en/reserved.variables.argv.php) and [getopt()](https://www.marsceau.com/blog/php-getopt/) should be sufficient
+  - For more complex apps, [ulrichsg/getopt-php](https://getopt-php.github.io/getopt-php/) can be used
+- Interactive menu: [php-school/cli-menu](https://github.com/php-school/cli-menu) 
+- Desktop Notification: [JoliNotif](https://github.com/jolicode/JoliNotif)
+
+### What if I need a full-featured CLI framework?
+In case you are planning for a multi-command, complex app that requires guided structure and organization, you may check: 
+- [Symfony Console Component](https://symfony.com/doc/current/components/console.html)
+- [Laravel Zero](https://laravel-zero.com/)
+- [MiniCLI](https://docs.minicli.dev/en/latest/)
 
 ## Contributing
 
