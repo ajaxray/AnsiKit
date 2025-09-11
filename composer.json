@@ -2,7 +2,8 @@
   "name": "ajaxray/ansikit",
   "description": "Tiny ANSI escape helper for terminal UIs (text styles, foreground & background colors, cursor positions, clearing) with table & banner helpers.",
   "type": "library",
-  "version": "0.0.1",
+  "version": "0.1.1"
+,
   "authors": [
     {
       "name": "Ajaxray",
