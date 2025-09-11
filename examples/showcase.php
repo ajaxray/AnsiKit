@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Ajaxray\AnsiKit\AnsiTerminal;
 use Ajaxray\AnsiKit\Components\Banner;
@@ -53,4 +53,3 @@ $progressbar
 
 $t->newline();
 $t->writeStyled("🎉 All examples complete!\n", [AnsiTerminal::TEXT_BOLD, AnsiTerminal::FG_GREEN]);
-

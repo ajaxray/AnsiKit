@@ -6,6 +6,7 @@ namespace Ajaxray\AnsiKit\Components;
 
 use Ajaxray\AnsiKit\AnsiTerminal;
 use Ajaxray\AnsiKit\Contracts\WriterInterface;
+use Ajaxray\AnsiKit\Support\Str;
 
 /**
  * Renders a bold, emoji-prefixed banner inside a rounded box.
@@ -52,7 +53,7 @@ final class Banner
         // Compute width
         $width = 0;
         foreach ($content as $line) {
-            $width = \max($width, $this->strLen($line));
+            $width = \max($width, Str::visibleLength($line));
         }
         $inner = $width + 2 * $pad;
 
@@ -68,7 +69,7 @@ final class Banner
         // Title line
         $this->t->write($v . \str_repeat(' ', $pad));
         $this->t->style(...$titleStyle)->write($first)->reset();
-        $this->t->write(\str_repeat(' ', $inner - $this->strLen($first) - $pad));
+        $this->t->write(\str_repeat(' ', $inner - Str::visibleLength($first) - $pad));
         $this->t->write($v)->newline();
 
         // Separator (optional)
@@ -80,7 +81,7 @@ final class Banner
         foreach ($lines as $line) {
             $this->t->write($v . \str_repeat(' ', $pad));
             $this->t->write($line);
-            $this->t->write(\str_repeat(' ', $inner - $this->strLen($line) - $pad));
+            $this->t->write(\str_repeat(' ', $inner - Str::visibleLength($line) - $pad));
             $this->t->write($v)->newline();
         }
 
@@ -88,9 +89,5 @@ final class Banner
         $this->t->write($bl . \str_repeat($h, $inner) . $br)->newline();
     }
 
-    private function strLen(string $s): int
-    {
-        $noAnsi = \preg_replace('/\e\[[0-9;]*m/', '', $s) ?? $s;
-        return \mb_strlen($noAnsi);
-    }
+    // Visible length handled by Support\Str
 }

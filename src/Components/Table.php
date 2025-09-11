@@ -6,6 +6,7 @@ namespace Ajaxray\AnsiKit\Components;
 
 use Ajaxray\AnsiKit\AnsiTerminal;
 use Ajaxray\AnsiKit\Contracts\WriterInterface;
+use Ajaxray\AnsiKit\Support\Str;
 
 final class Table
 {
@@ -72,11 +73,11 @@ final class Table
         for ($i = 0; $i < $cols; $i++) {
             $w = 0;
             if (isset($this->headers[$i])) {
-                $w = \max($w, $this->strLen($this->headers[$i]));
+                $w = \max($w, Str::visibleLength($this->headers[$i]));
             }
             foreach ($this->rows as $r) {
                 if (isset($r[$i])) {
-                    $w = \max($w, $this->strLen($r[$i]));
+                    $w = \max($w, Str::visibleLength($r[$i]));
                 }
             }
             $widths[$i] = $w;
@@ -97,7 +98,7 @@ final class Table
             $this->t->write($this->borderVertical);
             for ($i = 0; $i < $cols; $i++) {
                 $cell = $pad . ($this->headers[$i] ?? '') . $pad;
-                $cell .= \str_repeat(' ', ($widths[$i] + 2 * $this->padding) - $this->strLen($cell));
+                $cell .= \str_repeat(' ', ($widths[$i] + 2 * $this->padding) - Str::visibleLength($cell));
                 if ($this->headerBold) {
                     $this->t->writeStyled($cell, [AnsiTerminal::TEXT_BOLD]);
                 } else {
@@ -122,7 +123,7 @@ final class Table
             for ($i = 0; $i < $cols; $i++) {
                 $txt = $r[$i] ?? '';
                 $cell = $pad . $txt . $pad;
-                $cell .= \str_repeat(' ', ($widths[$i] + 2 * $this->padding) - $this->strLen($cell));
+                $cell .= \str_repeat(' ', ($widths[$i] + 2 * $this->padding) - Str::visibleLength($cell));
                 $this->t->write($cell);
                 $this->t->write($this->borderVertical);
             }
@@ -138,10 +139,5 @@ final class Table
         $this->t->newline();
     }
 
-    private function strLen(string $s): int
-    {
-        // crude width: treat bytes as mono-width; skip ANSI SGR sequences
-        $noAnsi = \preg_replace('/\e\[[0-9;]*m/', '', $s) ?? $s;
-        return \mb_strlen($noAnsi);
-    }
+    // Visible length handled by Support\Str
 }
