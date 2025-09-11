@@ -2,7 +2,13 @@
   <img src="media/AnsiKit.png" alt="AnsiKit" width="720" />
 </p>
 
-# AnsiKit
+# AnsiKit 
+
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/ajaxray/ansikit.svg?style=flat-square)](https://packagist.org/packages/ajaxray/ansikit)
+[![Total Downloads](https://img.shields.io/packagist/dt/ajaxray/ansikit.svg?style=flat-square)](https://packagist.org/packages/ajaxray/ansikit)
+[![Build Status](https://github.com/ajaxray/ansikit/actions/workflows/php.yml/badge.svg)](https://github.com/ajaxray/ansikit/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+
 
 Tiny, Zero-dependency ANSI escape helper for building terminal UIs in PHP. Chainable API for styles/colors/cursor control, with a few handy components (Table, Banner, Progressbar, Spinner) and utilities.
 
