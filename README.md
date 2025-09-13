@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="media/AnsiKit.png" alt="AnsiKit" width="720" />
+  <img src="media/AnsiKit.png" alt="AnsiKit" />
 </p>
 
 # AnsiKit 
@@ -14,7 +14,7 @@ Tiny, Zero-dependency ANSI escape helper for building terminal UIs in PHP. Chain
 
 Works any terminal that supports ANSI escapes (most modern terminals on macOS/Linux and Windows Terminal/ConEmu on Windows 10+).
 
-> Let's keep simple things simple. 😌  
+> **Let's keep simple things simple.** 😌  
 > You don't need a _whole framework_ to build a simple CLI app.
 
 ## Features
@@ -44,7 +44,7 @@ Autoloads via PSR‑4 namespace `Ajaxray\AnsiKit\`.
 require __DIR__ . '/vendor/autoload.php';
 
 use Ajaxray\AnsiKit\AnsiTerminal;
-use Ajaxray\AnsiKit\Components\{Table, Banner, Progressbar};
+use Ajaxray\AnsiKit\Components\{Table, Banner, Progressbar, Choice};
 
 $t = new AnsiTerminal();
 $t->clearScreen()->cursorHome();
@@ -64,6 +64,10 @@ $banner->render('Deploy Complete', '🚀', ['Everything shipped!']);
 
 $bar = new Progressbar();
 $bar->renderLine(75, 100, 'Loading files...');
+
+$choice = new Choice();
+$selected = $choice->prompt('Choose deployment target:', ['Production', 'Staging', 'Development']);
+$t->writeStyled("Selected: {$selected}\n", [AnsiTerminal::FG_GREEN]);
 ```
 
 ## Usage Overview
@@ -125,6 +129,34 @@ $s = new Spinner(); // or new Spinner(Spinner::ASCII)
 echo $s->next(); // prints next frame
 ```
 
+#### Choice
+
+```php
+use Ajaxray\AnsiKit\Components\Choice;
+
+// Basic usage (required choice)
+$choice = new Choice();
+$selected = $choice->prompt('Choose an option:', ['Option A', 'Option B', 'Option C']);
+// Returns: 'Option A', 'Option B', or 'Option C'
+
+// Optional choice (with Exit option)
+$choice = new Choice();
+$selected = $choice
+  ->required(false)
+  ->prompt('Select an action:', ['Deploy', 'Test', 'Rollback']);
+// Returns: 'Deploy', 'Test', 'Rollback', or false (if Exit chosen)
+
+// Styled choice
+$choice = new Choice();
+$selected = $choice
+  ->promptStyle([AnsiTerminal::TEXT_BOLD, AnsiTerminal::FG_CYAN])
+  ->optionStyle([AnsiTerminal::FG_GREEN])
+  ->numberStyle([AnsiTerminal::FG_YELLOW])
+  ->errorStyle([AnsiTerminal::FG_RED])
+  ->exitStyle([AnsiTerminal::FG_BRIGHT_BLACK])
+  ->prompt('Choose:', ['Option 1', 'Option 2']);
+```
+
 ### Helpers
 
 #### Input
@@ -170,6 +202,8 @@ Run the example scripts to see things in action:
 php examples/showcase.php   # basic styles, table, banner, bars
 php examples/progress.php   # animated status + progress bar
 php examples/input.php      # interactive input demo
+php examples/choice.php     # interactive choice component demo
+php examples/choice-menu.php # interactive menu system with choice
 ```
 
 ## Tips & Compatibility
