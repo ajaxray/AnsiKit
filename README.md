@@ -37,6 +37,13 @@ composer require ajaxray/ansikit
 
 Autoloads via PSR‑4 namespace `Ajaxray\AnsiKit\`.
 
+## Documentation
+
+- Getting started: [docs/index.md](docs/index.md)
+- Core API: [AnsiTerminal](docs/ansi-terminal.md)
+- Components: [Table](docs/components/table.md), [Banner](docs/components/banner.md), [Progressbar](docs/components/progressbar.md), [Spinner](docs/components/spinner.md), [Choice](docs/components/choice.md)
+- Support: [Input](docs/support/input.md), [Str](docs/support/str.md), [Keypress](docs/support/keypress.md)
+
 ## Quick Start
 
 ```php
@@ -74,6 +81,8 @@ $t->writeStyled("Selected: {$selected}\n", [AnsiTerminal::FG_GREEN]);
 
 ### Core: `AnsiTerminal`
 
+Docs: [AnsiTerminal](docs/ansi-terminal.md)
+
 - Text attributes: `TEXT_BOLD`, `TEXT_UNDERLINE`, `TEXT_STRIKE`, etc.
 - Foreground/background colors: standard (`FG_RED`), bright (`FG_BRIGHT_GREEN`), `fg256($n)`, `bg256($n)`, `fgRGB($r,$g,$b)`, `bgRGB(...)`
 - Cursor: `cursorTo($row, $col)`, `cursorUp($n)`, `hideCursor()`, `saveCursor()`, `enableAltBuffer()`
@@ -89,6 +98,8 @@ $t->style(AnsiTerminal::TEXT_BOLD, AnsiTerminal::FG_YELLOW)->write('Warning!')->
 
 #### Table
 
+Docs: [Table](docs/components/table.md)
+
 ```php
 use Ajaxray\AnsiKit\Components\Table;
 
@@ -101,6 +112,8 @@ use Ajaxray\AnsiKit\Components\Table;
 
 #### Banner
 
+Docs: [Banner](docs/components/banner.md)
+
 ```php
 use Ajaxray\AnsiKit\Components\Banner;
 
@@ -108,6 +121,8 @@ use Ajaxray\AnsiKit\Components\Banner;
 ```
 
 #### Progressbar
+
+Docs: [Progressbar](docs/components/progressbar.md)
 
 ```php
 use Ajaxray\AnsiKit\Components\Progressbar;
@@ -122,6 +137,8 @@ use Ajaxray\AnsiKit\Components\Progressbar;
 
 #### Spinner
 
+Docs: [Spinner](docs/components/spinner.md)
+
 ```php
 use Ajaxray\AnsiKit\Components\Spinner;
 
@@ -130,6 +147,8 @@ echo $s->next(); // prints next frame
 ```
 
 #### Choice
+
+Docs: [Choice](docs/components/choice.md)
 
 ```php
 use Ajaxray\AnsiKit\Components\Choice;
@@ -161,6 +180,8 @@ $selected = $choice
 
 #### Input
 
+Docs: [Input](docs/support/input.md)
+
 ```php
 use Ajaxray\AnsiKit\Support\Input;
 
@@ -172,6 +193,8 @@ $bio  = Input::multiline("Enter bio. End with 'END'", 'END');
 If the `readline` extension is available, `Input::line()` uses it for line editing/history; otherwise it falls back to `STDIN`.
 
 #### Str
+
+Docs: [Str](docs/support/str.md)
 
 ```php
 use Ajaxray\AnsiKit\Support\Str;
@@ -205,6 +228,8 @@ php examples/input.php      # interactive input demo
 php examples/choice.php     # interactive choice component demo
 php examples/choice-menu.php # interactive menu system with choice
 ```
+
+More guides and examples: see [docs/index.md](docs/index.md).
 
 ## Tips & Compatibility
 
@@ -257,4 +282,3 @@ If you change public APIs, update examples and this README. Small, focused PRs a
 ---
 
 Made with ❤️ for terminal builders. If you ship something with AnsiKit, I’d love to hear about it!
-

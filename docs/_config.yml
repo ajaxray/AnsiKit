@@ -1,0 +1,8 @@
+title: AnsiKit
+description: Tiny ANSI escape helper for terminal UIs in PHP
+remote_theme: just-the-docs/just-the-docs
+color_scheme: light
+search_enabled: true
+aux_links:
+  GitHub Repository: https://github.com/ajaxray/ansikit
+
