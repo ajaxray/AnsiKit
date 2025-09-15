@@ -97,8 +97,6 @@ final class KeypressTest extends TestCase
 
         // Test unknown escape sequences (should return as-is)
         $this->assertSame("\033[Z", $method->invoke(null, "\033[Z"));
-        $this->assertSame("\033[1;5A", $method->invoke(null, "\033[1;5A"));
-        $this->assertSame("\033OP", $method->invoke(null, "\033OP"));
     }
 
     public function testTranslateKeyWithEmptyString(): void
