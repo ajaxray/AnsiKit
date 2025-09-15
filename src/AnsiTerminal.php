@@ -21,8 +21,11 @@ final class AnsiTerminal
     private WriterInterface $writer;
 
     // Base escapes
-    public const ESC = "\033";
-    public const CSI = "\033[";
+    // @see https://en.wikipedia.org/wiki/Escape_sequence
+    public const ESC = "\033";  // ESC (Escape) escape sequence
+
+    // @see https://en.wikipedia.org/wiki/C0_and_C1_control_codes#CSI_(Control_Sequence_Introducer).
+    public const CSI = "\033["; // Control Sequence Introducer (CSI) escape sequence
 
     // --- Text attributes (SGR) ---
     public const TEXT_RESET = 0;

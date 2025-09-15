@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
 
-Tiny, Zero-dependency ANSI escape helper for building terminal UIs in PHP. Chainable API for styles/colors/cursor control, with a few handy components (Table, Banner, Progressbar, Spinner) and utilities.
+Tiny, easy-to-remember ANSI escape helper for building terminal UIs in PHP. Chainable API for styles/colors/cursor control, with a few handy components (Table, Banner, Progressbar etc.) and utilities.
 
 Works any terminal that supports ANSI escapes (most modern terminals on macOS/Linux and Windows Terminal/ConEmu on Windows 10+).
 
@@ -29,7 +29,7 @@ Works any terminal that supports ANSI escapes (most modern terminals on macOS/Li
 
 ## Installation
 
-Requirements: PHP >= 8.1
+Requirements: PHP >= 8.2 and (composer)[https://getcomposer.org/]
 
 ```bash
 composer require ajaxray/ansikit
@@ -203,6 +203,24 @@ $plain = Str::stripAnsi("\033[1;31mError\033[0m");
 $len   = Str::visibleLength("Styled \033[1mtext\033[0m");
 ```
 
+#### Keypress
+
+Docs: [Keypress](docs/support/keypress.md)
+
+```php
+use Ajaxray\AnsiKit\Support\Keypress;
+
+// Blocking read (returns a normalized key constant or single char)
+$key = Keypress::listen();
+if ($key === Keypress::KEY_UP) { /* move up */ }
+
+// Non-blocking read with timeout (in milliseconds)
+if ($key = Keypress::listenNonBlocking(100)) {
+    // Works with arrows, ENTER/ESC/TAB/BACKSPACE, CTRL+A..Z, F1..F12, HOME/END/PgUp/PgDn, and more
+    echo Keypress::getKeyName($key); // e.g., "CTRL+C", "UP ARROW", "'a'"
+}
+```
+
 ### Writers
 
 - `StdoutWriter` (default): writes to `php://stdout` or a provided stream
@@ -227,6 +245,8 @@ php examples/progress.php   # animated status + progress bar
 php examples/input.php      # interactive input demo
 php examples/choice.php     # interactive choice component demo
 php examples/choice-menu.php # interactive menu system with choice
+php examples/keypress.php    # interactive key handling demo
+php examples/keypress-advanced.php # advanced key sequences, modifiers
 ```
 
 More guides and examples: see [docs/index.md](docs/index.md).

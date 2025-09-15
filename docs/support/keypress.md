@@ -6,7 +6,8 @@ nav_order: 3
 
 # Keypress — Interactive Keyboard Input
 
-Detect keyboard input in terminal apps using constants and helpers.
+Read raw keyboard input and work with normalized key names. 
+Supports arrows, ENTER/ESC/TAB/BACKSPACE, CTRL+A..Z, F1..F12, HOME/END/PgUp/PgDn, and modified arrows (Ctrl/Alt/Shift).
 
 ## Run the examples
 
@@ -27,7 +28,44 @@ if ($key === Keypress::KEY_UP) {
 }
 ```
 
-## Common constants
+## What you get
+
+- Arrows and basics: `KEY_UP`, `KEY_DOWN`, `KEY_LEFT`, `KEY_RIGHT`, `KEY_ENTER`, `KEY_SPACE`, `KEY_BACKSPACE`, `KEY_TAB`, `KEY_ESC`
+- Ctrl combos: `KEY_CTRL_A` .. `KEY_CTRL_Z`
+- Function keys: `KEY_F1` .. `KEY_F12`
+- Navigation: `KEY_HOME`, `KEY_END`, `KEY_PAGE_UP`, `KEY_PAGE_DOWN`, `KEY_INSERT`, `KEY_DELETE`
+- Modified arrows: `KEY_CTRL_UP/DOWN/LEFT/RIGHT`, `KEY_ALT_*`, `KEY_SHIFT_*`
+
+Unknown sequences are returned as‑is (raw string), and printable single characters are returned directly (e.g., `'a'`).
+
+```php
+// Example: switch by normalized keys
+switch ($key = Keypress::listen()) {
+    case Keypress::KEY_UP:   /* ... */ break;
+    case Keypress::KEY_DOWN: /* ... */ break;
+    case Keypress::KEY_ENTER: /* select */ break;
+    case 'q': /* quit */ break;           // regular characters come through as-is
+}
+```
+
+## Non-blocking reads
+
+Use `listenNonBlocking($timeoutMs)` to poll without freezing your UI loop:
+
+```php
+use Ajaxray\AnsiKit\Support\Keypress;
+
+while (true) {
+    // render/update UI...
+    if ($key = Keypress::listenNonBlocking(50)) {
+        if ($key === Keypress::KEY_ESC) break;
+        // handle key...
+    }
+    // do other work, animation ticks, etc.
+}
+```
+
+## Helpers
 
 ```php
 // Arrows & basics
@@ -49,6 +87,8 @@ $name = Keypress::getKeyName(Keypress::KEY_CTRL_C); // "CTRL+C"
 $alt  = Keypress::detectAltKey($key);               // e.g., "ALT+X" or null
 ```
 
+`getKeyName()` is handy for debugging or displaying feedback; `detectAltKey()` recognizes simple Alt+<key> sequences that come as ESC-prefixed printable chars.
+
 ## Menu navigation example
 
 ```php
@@ -65,6 +105,20 @@ while (true) {
 }
 ```
 
-Notes
-- Terminal support varies for function/modified keys; prefer constants and provide fallbacks.
-- See `tests/Support/KeypressTest.php` for exhaustive behaviors.
+## Show pressed key info (debug)
+
+```php
+use Ajaxray\AnsiKit\Support\Keypress;
+
+echo "Press keys (ESC to exit)\n";
+while (true) {
+    $raw = Keypress::listen();
+    if ($raw === Keypress::KEY_ESC) break;
+    $name = Keypress::getKeyName($raw);
+    printf("Key: %-14s Raw: %s\n", $name, json_encode($raw));
+}
+```
+
+Tips
+- Terminal support can vary for function/modified keys; prefer constants and provide fallbacks for raw sequences.
+- See `tests/Support/KeypressTest.php` and `examples/keypress*.php` for comprehensive behaviors.

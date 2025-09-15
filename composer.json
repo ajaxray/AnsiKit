@@ -2,7 +2,7 @@
   "name": "ajaxray/ansikit",
   "description": "Tiny ANSI escape helper for terminal UIs (text styles, foreground & background colors, cursor positions, clearing) with table, progressbar, and more helpers.",
   "type": "library",
-  "version": "v0.2.2"
+  "version": "v0.2.3"
 ,
   "authors": [
     {
@@ -12,7 +12,8 @@
   ],
   "license": "MIT",
   "require": {
-    "php": ">=8.2"
+    "php": ">=8.2",
+    "soloterm/grapheme": "^1.0"
   },
   "autoload": {
     "psr-4": {

@@ -82,33 +82,58 @@ final class Keypress
     public const KEY_DELETE = 'DELETE';
     /**
      * Listen for keypress and return the pressed key.
+     * Blocks without busy spinning using stream_select().
      */
     public static function listen(): string
     {
         $stdin = fopen('php://stdin', 'r');
 
-        // changing your terminal mode so it
-        // - doesn’t echo characters
-        // - reads input in cbreak mode (i.e. characters are available immediately)
-        // - make the stream non-blocking (so reads return immediately if there’s no data)
+        // Enable cbreak and disable echo to read raw keys
         stream_set_blocking($stdin, false);
         system('stty cbreak -echo');
 
-        // Read a single character from STDIN
-        while (true) {
-            $char = fgets($stdin);
-            if ($char !== false) {
-                break;
-            }
-        }
+        // Wait until input is available without busy loop
+        $char = '';
+        $read = [$stdin];
+        $write = null; $except = null;
+        @stream_select($read, $write, $except, null); // block until readable
+        $char = stream_get_contents($stdin, 8) ?: '';
 
         // restore the terminal mode
         system('stty sane');
         stream_set_blocking($stdin, true);
-
         fclose($stdin);
 
         return self::translateKey($char);
+    }
+
+    /**
+     * Non-blocking keypress listener with timeout.
+     * Returns a key name or null when no key is pressed within the timeout.
+     */
+    public static function listenNonBlocking(int $timeoutMs = 100): ?string
+    {
+        $stdin = fopen('php://stdin', 'r');
+        stream_set_blocking($stdin, false);
+        system('stty cbreak -echo');
+
+        try {
+            $read = [$stdin];
+            $write = null; $except = null;
+            $sec = intdiv($timeoutMs, 1000);
+            $usec = ($timeoutMs % 1000) * 1000;
+            $n = @stream_select($read, $write, $except, $sec, $usec);
+            if ($n === false || $n === 0) {
+                return null; // timeout or error
+            }
+
+            $char = stream_get_contents($stdin, 8) ?: '';
+            return self::translateKey($char);
+        } finally {
+            system('stty sane');
+            stream_set_blocking($stdin, true);
+            fclose($stdin);
+        }
     }
 
     private static function translateKey(string $key): string
@@ -294,4 +319,3 @@ final class Keypress
         return null;
     }
 }
-

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ajaxray\AnsiKit\Support;
 
+use SoloTerm\Grapheme\Grapheme;
+
 /**
  * Public string helpers that are ANSI-aware.
  */
@@ -23,7 +25,7 @@ final class Str
     public static function visibleLength(string $s): int
     {
         $noAnsi = self::stripAnsi($s);
-        return mb_strlen($noAnsi);
+        return Grapheme::wcwidth($noAnsi);
     }
 }
 
