@@ -27,6 +27,14 @@ Works any terminal that supports ANSI escapes (most modern terminals on macOS/Li
 - Helpers: ANSI‑aware string length, simple input (line/multiline/confirm)
 - PSR‑12, strict types, DI‑friendly, zero dependencies
 
+## A Quick Primer
+
+Run the example demo: `php examples/showcase.php`.  
+This should render the following in dark mode terminal:
+![showcase.png](media/showcase.png)
+
+Check below the [Examples](#examples) section for more demos.
+
 ## Installation
 
 Requirements: PHP >= 8.2 and (composer)[https://getcomposer.org/]
@@ -42,7 +50,7 @@ Autoloads via PSR‑4 namespace `Ajaxray\AnsiKit\`.
 - Getting started: [docs/index.md](docs/index.md)
 - Core API: [AnsiTerminal](docs/ansi-terminal.md)
 - Components: [Table](docs/components/table.md), [Banner](docs/components/banner.md), [Progressbar](docs/components/progressbar.md), [Spinner](docs/components/spinner.md), [Choice](docs/components/choice.md)
-- Support: [Input](docs/support/input.md), [Str](docs/support/str.md), [Keypress](docs/support/keypress.md)
+- Support: [Input](docs/support/input.md), [Str](docs/support/str.md), [Keypress](docs/support/keypress.md), [Util](docs/support/util.md)
 
 ## Quick Start
 
@@ -67,7 +75,7 @@ $table->setHeaders('Name','Age', 'Adult?')
     ->render();
 
 $banner = new Banner();
-$banner->render('Deploy Complete', '🚀', ['Everything shipped!']);
+$banner->render('Deploy Complete', ['Everything shipped!']);
 
 $bar = new Progressbar();
 $bar->renderLine(75, 100, 'Loading files...');
@@ -117,7 +125,7 @@ Docs: [Banner](docs/components/banner.md)
 ```php
 use Ajaxray\AnsiKit\Components\Banner;
 
-(new Banner())->render('Deploy Complete', '🚀', ['Everything shipped!', 'Tag: v1.2.3']);
+(new Banner())->render('Deploy Complete', ['Everything shipped!', 'Tag: v1.2.3']);
 ```
 
 #### Progressbar
@@ -203,6 +211,19 @@ $plain = Str::stripAnsi("\033[1;31mError\033[0m");
 $len   = Str::visibleLength("Styled \033[1mtext\033[0m");
 ```
 
+#### Util
+
+Docs: [Util](docs/support/util.md)
+
+```php
+use Ajaxray\AnsiKit\Support\Util;
+use Ajaxray\AnsiKit\AnsiTerminal;
+
+$terminal = new AnsiTerminal();
+Util::setTerminalTabTitle('Build in progress', $terminal);
+Util::beep($terminal);
+```
+
 #### Keypress
 
 Docs: [Keypress](docs/support/keypress.md)
@@ -247,6 +268,7 @@ php examples/choice.php     # interactive choice component demo
 php examples/choice-menu.php # interactive menu system with choice
 php examples/keypress.php    # interactive key handling demo
 php examples/keypress-advanced.php # advanced key sequences, modifiers
+php examples/util.php        # tab title + bell helper demo
 ```
 
 More guides and examples: see [docs/index.md](docs/index.md).

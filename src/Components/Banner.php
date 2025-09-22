@@ -9,12 +9,7 @@ use Ajaxray\AnsiKit\Contracts\WriterInterface;
 use Ajaxray\AnsiKit\Support\Str;
 
 /**
- * Renders a bold, emoji-prefixed banner inside a rounded box.
- *
- * Example:
- *   (emoji)  🚀
- *   (title)  "Deploy Complete"
- *   (subtitle) optional description lines
+ * Renders a bold title inside a rounded box, optionally with detail lines.
  */
 final class Banner
 {
@@ -27,25 +22,22 @@ final class Banner
 
     /**
      * @param string $title Main text (bold)
-     * @param string $emoji E.g. "🚀"
      * @param list<string> $lines Additional lines under title
      * @param int $padding Spaces inside box each side
      * @param array<int> $titleStyle Additional SGR codes (e.g., [AnsiTerminal::FG_GREEN])
      */
     public function render(
         string $title,
-        string $emoji = '✨',
-        array  $lines = [],
-        int    $padding = 2,
-        array  $titleStyle = [AnsiTerminal::TEXT_BOLD]
+        array $lines = [],
+        int $padding = 2,
+        array $titleStyle = [AnsiTerminal::TEXT_BOLD]
     ): void
     {
         $pad = \max(0, $padding);
 
         // Build visible lines
         $content = [];
-        $first = \trim($emoji) !== '' ? "{$emoji}  {$title}" : $title;
-        $content[] = $first;
+        $content[] = $title;
         foreach ($lines as $l) {
             $content[] = $l;
         }
@@ -68,8 +60,8 @@ final class Banner
 
         // Title line
         $this->t->write($v . \str_repeat(' ', $pad));
-        $this->t->style(...$titleStyle)->write($first)->reset();
-        $this->t->write(\str_repeat(' ', $inner - Str::visibleLength($first) - $pad));
+        $this->t->style(...$titleStyle)->write($title)->reset();
+        $this->t->write(\str_repeat(' ', $inner - Str::visibleLength($title) - $pad));
         $this->t->write($v)->newline();
 
         // Separator (optional)

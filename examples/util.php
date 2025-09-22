@@ -31,5 +31,5 @@ $t->write("Press Enter to restore your previous tab title and exit.\n");
 fgets(STDIN);
 
 // Restoring the title of terminal tab
-Util::setTerminalTabTitle('Terminal', $t);
+Util::restoreTerminalTabTitle($t);
 $t->writeStyled("Tab title reset. Bye!\n", [AnsiTerminal::FG_GREEN]);

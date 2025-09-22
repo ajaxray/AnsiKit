@@ -31,4 +31,10 @@ final class Util
             \file_put_contents('php://output', $seq);
         }
     }
+
+    public static function restoreTerminalTabTitle(?AnsiTerminal $terminal = null): void
+    {
+        // Change back to previous title
+        self::setTerminalTabTitle('Terminal', $terminal);
+    }
 }

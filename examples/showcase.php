@@ -11,9 +11,11 @@ use Ajaxray\AnsiKit\Components\Progressbar;
 $t = new AnsiTerminal();
 $t->clearScreen()->cursorHome();
 
-$t->writeStyled("Hello PHP Ninja! 🥷\n", [AnsiTerminal::TEXT_BOLD, AnsiTerminal::FG_GREEN]);
-$t->fg256(202)->bg256(235)->write("256-colors")->reset()->newline();
-$t->fgRGB(255, 165, 0)->write("truecolor")->reset()->newline();
+$t->writeStyled("Hello PHP Ninja! 🥷\n", [AnsiTerminal::TEXT_BOLD, AnsiTerminal::FG_GREEN])->newline();
+
+$t->writeStyled("Testing Colors... \n", [AnsiTerminal::TEXT_BOLD, AnsiTerminal::FG_CYAN]);
+$t->fg256(202)->bg256(235)->write("Supports 256-colors")->reset()->newline();
+$t->fgRGB(255, 165, 0)->write("Supports truecolor (RGB)")->reset()->newline();
 
 // Table
 $table = new Table();
@@ -23,9 +25,11 @@ $table->setHeaders('Table', 'Testing', 'Status')
     ->addRow('Environment', 'Staging', '⭕')
     ->render();
 
+
 // Banner
+(new Banner())->render('A Quick text banner');
 $banner = new Banner();
-$banner->render('Deploy Complete', '🚀', ['Everything shipped!', 'Tag: v1.2.3']);
+$banner->render('Banner with details and style', ['Everything shipped!', 'Tag: v1.2.3'], 2, [AnsiTerminal::FG_GREEN, AnsiTerminal::TEXT_BOLD]);
 
 $t->newline();
 

@@ -25,7 +25,7 @@ final class Str
     public static function visibleLength(string $s): int
     {
         $noAnsi = self::stripAnsi($s);
-        return Grapheme::wcwidth($noAnsi);
+        return mb_strlen($noAnsi);
     }
 }
 

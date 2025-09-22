@@ -43,4 +43,7 @@ When no `AnsiTerminal` is supplied the sequence is written to STDOUT, so it also
 Util::setTerminalTabTitle('Deploy in progress');
 ```
 
-Tip: remember to restore the previous title before exiting long-running tasks. The `examples/util.php` script shows one way to do this interactively.
+## Restore Terminal / Tab Title
+
+Restore the previous title set by `setTerminalTabTitle()`  / `setTerminalTabTitle($terminal)`.
+
