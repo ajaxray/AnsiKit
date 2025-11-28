@@ -125,6 +125,23 @@ $panel6->layout('vertical')
 
 $t->newline();
 
+// Example 8: Panel with rounded corners
+$t->writeStyled("8. Panel with Rounded Corners\n", [AnsiTerminal::TEXT_BOLD]);
+
+$panel8 = new Panel();
+$roundedBlock1 = (new PanelBlock())->content('Rounded corners')->width(30);
+$roundedBlock2 = (new PanelBlock())->content('Like Banner component')->width(30);
+
+$panel8->layout('vertical')
+    ->border(true)
+    ->dividers(true)
+    ->corners('rounded')
+    ->addBlock($roundedBlock1)
+    ->addBlock($roundedBlock2)
+    ->render();
+
+$t->newline();
+
 // Example 7: Nested panels (Panel inside Panel)
 $t->writeStyled("7. Dashboard Layout\n", [AnsiTerminal::TEXT_BOLD]);
 

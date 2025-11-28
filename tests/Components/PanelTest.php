@@ -203,4 +203,108 @@ final class PanelTest extends TestCase
         $block = new PanelBlock();
         $block->overflow('invalid');
     }
+
+    public function testPanelCornerStyleValidation(): void
+    {
+        $panel = new Panel();
+        
+        // Test valid corner styles
+        $this->assertInstanceOf(Panel::class, $panel->corners('sharp'));
+        $this->assertInstanceOf(Panel::class, $panel->corners('rounded'));
+        
+        // Test invalid corner style
+        $this->expectException(\InvalidArgumentException::class);
+        $panel->corners('invalid');
+    }
+
+    public function testPanelBlockCornerStyleValidation(): void
+    {
+        $block = new PanelBlock();
+        
+        // Test valid corner styles
+        $this->assertInstanceOf(PanelBlock::class, $block->corners('sharp'));
+        $this->assertInstanceOf(PanelBlock::class, $block->corners('rounded'));
+        
+        // Test invalid corner style
+        $this->expectException(\InvalidArgumentException::class);
+        $block->corners('invalid');
+    }
+
+    public function testPanelRoundedCorners(): void
+    {
+        $writer = new MemoryWriter();
+        $panel = new Panel($writer);
+        
+        $block = (new PanelBlock())->content('Test')->width(20);
+        
+        $panel->layout('vertical')
+            ->border(true)
+            ->corners('rounded')
+            ->addBlock($block)
+            ->render();
+        
+        $output = $writer->getBuffer();
+        
+        // Should contain rounded corner characters
+        $this->assertStringContainsString('╭', $output);
+        $this->assertStringContainsString('╮', $output);
+        $this->assertStringContainsString('╰', $output);
+        $this->assertStringContainsString('╯', $output);
+        
+        // Should not contain sharp corner characters
+        $this->assertStringNotContainsString('┌', $output);
+        $this->assertStringNotContainsString('┐', $output);
+        $this->assertStringNotContainsString('└', $output);
+        $this->assertStringNotContainsString('┘', $output);
+    }
+
+    public function testPanelBlockRoundedCorners(): void
+    {
+        $block = (new PanelBlock())
+            ->content('Test')
+            ->width(20)
+            ->border(true)
+            ->corners('rounded');
+        
+        $output = $block->render();
+        
+        // Should contain rounded corner characters
+        $this->assertStringContainsString('╭', $output);
+        $this->assertStringContainsString('╮', $output);
+        $this->assertStringContainsString('╰', $output);
+        $this->assertStringContainsString('╯', $output);
+        
+        // Should not contain sharp corner characters
+        $this->assertStringNotContainsString('┌', $output);
+        $this->assertStringNotContainsString('┐', $output);
+        $this->assertStringNotContainsString('└', $output);
+        $this->assertStringNotContainsString('┘', $output);
+    }
+
+    public function testPanelDefaultCornerStyle(): void
+    {
+        $writer = new MemoryWriter();
+        $panel = new Panel($writer);
+        
+        $block = (new PanelBlock())->content('Test')->width(20);
+        
+        $panel->layout('vertical')
+            ->border(true)
+            ->addBlock($block)
+            ->render();
+        
+        $output = $writer->getBuffer();
+        
+        // Should contain sharp corner characters (default)
+        $this->assertStringContainsString('┌', $output);
+        $this->assertStringContainsString('┐', $output);
+        $this->assertStringContainsString('└', $output);
+        $this->assertStringContainsString('┘', $output);
+        
+        // Should not contain rounded corner characters
+        $this->assertStringNotContainsString('╭', $output);
+        $this->assertStringNotContainsString('╮', $output);
+        $this->assertStringNotContainsString('╰', $output);
+        $this->assertStringNotContainsString('╯', $output);
+    }
 }

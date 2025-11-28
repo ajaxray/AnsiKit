@@ -21,6 +21,19 @@ final class Panel
     private bool $hasBorder = false;
     private bool $hasDividers = false;
     private string $dividerChar = '│';
+    private string $cornerStyle = 'sharp'; // 'sharp' or 'rounded'
+    
+    // Corner characters for sharp style
+    private string $sharpTopLeft = '┌';
+    private string $sharpTopRight = '┐';
+    private string $sharpBottomLeft = '└';
+    private string $sharpBottomRight = '┘';
+    
+    // Corner characters for rounded style
+    private string $roundedTopLeft = '╭';
+    private string $roundedTopRight = '╮';
+    private string $roundedBottomLeft = '╰';
+    private string $roundedBottomRight = '╯';
 
     public function __construct(?WriterInterface $writer = null)
     {
@@ -78,6 +91,40 @@ final class Panel
     }
 
     /**
+     * Set corner style: 'sharp' or 'rounded'.
+     */
+    public function corners(string $style): self
+    {
+        if (!in_array($style, ['sharp', 'rounded'], true)) {
+            throw new \InvalidArgumentException('Corner style must be "sharp" or "rounded"');
+        }
+        $this->cornerStyle = $style;
+        return $this;
+    }
+
+    /**
+     * Get the current corner characters based on style.
+     */
+    private function getCornerCharacters(): array
+    {
+        if ($this->cornerStyle === 'rounded') {
+            return [
+                'topLeft' => $this->roundedTopLeft,
+                'topRight' => $this->roundedTopRight,
+                'bottomLeft' => $this->roundedBottomLeft,
+                'bottomRight' => $this->roundedBottomRight,
+            ];
+        }
+        
+        return [
+            'topLeft' => $this->sharpTopLeft,
+            'topRight' => $this->sharpTopRight,
+            'bottomLeft' => $this->sharpBottomLeft,
+            'bottomRight' => $this->sharpBottomRight,
+        ];
+    }
+
+    /**
      * Render the panel with all blocks.
      */
     public function render(): void
@@ -99,9 +146,10 @@ final class Panel
     private function renderVertical(): void
     {
         $panelWidth = $this->getPanelWidth();
+        $corners = $this->getCornerCharacters();
         
         if ($this->hasBorder) {
-            $this->t->write('┌' . str_repeat('─', $panelWidth) . '┐')->newline();
+            $this->t->write($corners['topLeft'] . str_repeat('─', $panelWidth) . $corners['topRight'])->newline();
         }
         
         foreach ($this->blocks as $index => $block) {
@@ -130,7 +178,7 @@ final class Panel
         }
         
         if ($this->hasBorder) {
-            $this->t->write('└' . str_repeat('─', $panelWidth) . '┘')->newline();
+            $this->t->write($corners['bottomLeft'] . str_repeat('─', $panelWidth) . $corners['bottomRight'])->newline();
         }
     }
 
@@ -158,8 +206,9 @@ final class Panel
             $totalWidth += count($this->blocks) - 1; // Add space for dividers
         }
         
+        $corners = $this->getCornerCharacters();
         if ($this->hasBorder) {
-            $this->t->write('┌' . str_repeat('─', $totalWidth) . '┐')->newline();
+            $this->t->write($corners['topLeft'] . str_repeat('─', $totalWidth) . $corners['topRight'])->newline();
         }
         
         // Render each line
@@ -188,7 +237,7 @@ final class Panel
         }
         
         if ($this->hasBorder) {
-            $this->t->write('└' . str_repeat('─', $totalWidth) . '┘')->newline();
+            $this->t->write($corners['bottomLeft'] . str_repeat('─', $totalWidth) . $corners['bottomRight'])->newline();
         }
     }
 

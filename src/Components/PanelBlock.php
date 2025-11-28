@@ -19,6 +19,19 @@ final class PanelBlock implements WriterInterface
     private int $fixedWidth = 0;
     private int $fixedHeight = 0;
     private ?WriterInterface $writer = null;
+    private string $cornerStyle = 'sharp'; // 'sharp' or 'rounded'
+    
+    // Corner characters for sharp style
+    private string $sharpTopLeft = '┌';
+    private string $sharpTopRight = '┐';
+    private string $sharpBottomLeft = '└';
+    private string $sharpBottomRight = '┘';
+    
+    // Corner characters for rounded style
+    private string $roundedTopLeft = '╭';
+    private string $roundedTopRight = '╮';
+    private string $roundedBottomLeft = '╰';
+    private string $roundedBottomRight = '╯';
 
     public function __construct(?WriterInterface $writer = null)
     {
@@ -79,6 +92,40 @@ final class PanelBlock implements WriterInterface
     {
         $this->fixedHeight = max(0, $height);
         return $this;
+    }
+
+    /**
+     * Set corner style: 'sharp' or 'rounded'.
+     */
+    public function corners(string $style): self
+    {
+        if (!in_array($style, ['sharp', 'rounded'], true)) {
+            throw new \InvalidArgumentException('Corner style must be "sharp" or "rounded"');
+        }
+        $this->cornerStyle = $style;
+        return $this;
+    }
+
+    /**
+     * Get the current corner characters based on style.
+     */
+    private function getCornerCharacters(): array
+    {
+        if ($this->cornerStyle === 'rounded') {
+            return [
+                'topLeft' => $this->roundedTopLeft,
+                'topRight' => $this->roundedTopRight,
+                'bottomLeft' => $this->roundedBottomLeft,
+                'bottomRight' => $this->roundedBottomRight,
+            ];
+        }
+        
+        return [
+            'topLeft' => $this->sharpTopLeft,
+            'topRight' => $this->sharpTopRight,
+            'bottomLeft' => $this->sharpBottomLeft,
+            'bottomRight' => $this->sharpBottomRight,
+        ];
     }
 
     /**
@@ -239,12 +286,13 @@ final class PanelBlock implements WriterInterface
         
         // Add border if enabled
         if ($this->hasBorder) {
+            $corners = $this->getCornerCharacters();
             $borderedLines = [];
-            $borderedLines[] = '┌' . str_repeat('─', $contentWidth) . '┐';
+            $borderedLines[] = $corners['topLeft'] . str_repeat('─', $contentWidth) . $corners['topRight'];
             foreach ($lines as $line) {
                 $borderedLines[] = '│' . $line . '│';
             }
-            $borderedLines[] = '└' . str_repeat('─', $contentWidth) . '┘';
+            $borderedLines[] = $corners['bottomLeft'] . str_repeat('─', $contentWidth) . $corners['bottomRight'];
             return $borderedLines;
         }
         
