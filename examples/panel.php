@@ -22,7 +22,7 @@ $block1 = (new PanelBlock())->content('First Block')->width(40);
 $block2 = (new PanelBlock())->content('Second Block')->width(40);
 $block3 = (new PanelBlock())->content('Third Block')->width(40);
 
-$panel1->layout('vertical')
+$panel1->layout(Panel::LAYOUT_VERTICAL)
     ->border(true)
     ->dividers(true)
     ->addBlock($block1)
@@ -40,7 +40,7 @@ $leftBlock = (new PanelBlock())->content("Left Column\nLine 2\nLine 3")->width(2
 $middleBlock = (new PanelBlock())->content("Middle Column\nMore text\nEven more")->width(20);
 $rightBlock = (new PanelBlock())->content("Right Column\nData here\nLast line")->width(20);
 
-$panel2->layout('horizontal')
+$panel2->layout(Panel::LAYOUT_HORIZONTAL)
     ->border(true)
     ->dividers(true)
     ->addBlock($leftBlock)
@@ -57,7 +57,7 @@ $panel3 = new Panel();
 $borderedBlock1 = (new PanelBlock())->content('Bordered Block 1')->width(25)->border(true);
 $borderedBlock2 = (new PanelBlock())->content('Bordered Block 2')->width(25)->border(true);
 
-$panel3->layout('vertical')
+$panel3->layout(Panel::LAYOUT_VERTICAL)
     ->addBlock($borderedBlock1)
     ->addBlock($borderedBlock2)
     ->render();
@@ -72,7 +72,7 @@ $longText = "This is a very long text that will be wrapped automatically when it
 $wrappedBlock = (new PanelBlock())
     ->content($longText)
     ->width(40)
-    ->overflow('wordwrap')
+    ->overflow(PanelBlock::OVERFLOW_WORDWRAP)
     ->border(true);
 
 $panel4->addBlock($wrappedBlock)->render();
@@ -87,7 +87,7 @@ $smallBlock = (new PanelBlock())->content("Small\n10 cols")->width(10);
 $mediumBlock = (new PanelBlock())->content("Medium\n20 cols")->width(20);
 $largeBlock = (new PanelBlock())->content("Large\n30 cols")->width(30);
 
-$panel5->layout('horizontal')
+$panel5->layout(Panel::LAYOUT_HORIZONTAL)
     ->border(true)
     ->dividers(true)
     ->setSizes([10, 20, 30])
@@ -116,7 +116,7 @@ $bannerBlock = new PanelBlock();
 $banner = new Banner($bannerBlock);
 $banner->render('Success!', ['All tasks completed']);
 
-$panel6->layout('vertical')
+$panel6->layout(Panel::LAYOUT_VERTICAL)
     ->border(true)
     ->dividers(true)
     ->addBlock($tableBlock)
@@ -132,10 +132,10 @@ $panel8 = new Panel();
 $roundedBlock1 = (new PanelBlock())->content('Rounded corners')->width(30);
 $roundedBlock2 = (new PanelBlock())->content('Like Banner component')->width(30);
 
-$panel8->layout('vertical')
+$panel8->layout(Panel::LAYOUT_VERTICAL)
     ->border(true)
     ->dividers(true)
-    ->corners('rounded')
+    ->corners(Panel::CORNER_ROUNDED)
     ->addBlock($roundedBlock1)
     ->addBlock($roundedBlock2)
     ->render();
@@ -159,7 +159,7 @@ $stat1 = (new PanelBlock())->content("CPU\n45%")->width(18);
 $stat2 = (new PanelBlock())->content("Memory\n2.3GB")->width(18);
 $stat3 = (new PanelBlock())->content("Disk\n120GB")->width(18);
 
-$statsPanel->layout('horizontal')
+$statsPanel->layout(Panel::LAYOUT_HORIZONTAL)
     ->dividers(true, '│')
     ->addBlock($stat1)
     ->addBlock($stat2)
@@ -171,7 +171,7 @@ $footerBlock = (new PanelBlock())
     ->content('Last updated: 2025-11-28 19:33')
     ->width(60);
 
-$dashboard->layout('vertical')
+$dashboard->layout(Panel::LAYOUT_VERTICAL)
     ->border(true)
     ->dividers(true)
     ->addBlock($headerBlock)

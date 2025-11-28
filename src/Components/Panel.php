@@ -14,14 +14,22 @@ use Ajaxray\AnsiKit\Support\Str;
  */
 final class Panel
 {
+    // Layout constants
+    public const LAYOUT_VERTICAL = 'vertical';
+    public const LAYOUT_HORIZONTAL = 'horizontal';
+    
+    // Corner style constants
+    public const CORNER_SHARP = 'sharp';
+    public const CORNER_ROUNDED = 'rounded';
+
     private AnsiTerminal $t;
-    private string $layout = 'vertical'; // 'vertical' or 'horizontal'
+    private string $layout = self::LAYOUT_VERTICAL;
     private array $blocks = [];
     private array $sizes = []; // Custom sizes for blocks
     private bool $hasBorder = false;
     private bool $hasDividers = false;
     private string $dividerChar = '│';
-    private string $cornerStyle = 'sharp'; // 'sharp' or 'rounded'
+    private string $cornerStyle = self::CORNER_SHARP;
     
     // Corner characters for sharp style
     private string $sharpTopLeft = '┌';
@@ -41,11 +49,11 @@ final class Panel
     }
 
     /**
-     * Set layout direction: 'vertical' (rows) or 'horizontal' (columns).
+     * Set layout direction: Panel::LAYOUT_VERTICAL or Panel::LAYOUT_HORIZONTAL.
      */
     public function layout(string $layout): self
     {
-        if (!in_array($layout, ['vertical', 'horizontal'], true)) {
+        if (!in_array($layout, [self::LAYOUT_VERTICAL, self::LAYOUT_HORIZONTAL], true)) {
             throw new \InvalidArgumentException('Layout must be "vertical" or "horizontal"');
         }
         $this->layout = $layout;
@@ -91,11 +99,11 @@ final class Panel
     }
 
     /**
-     * Set corner style: 'sharp' or 'rounded'.
+     * Set corner style: Panel::CORNER_SHARP or Panel::CORNER_ROUNDED.
      */
     public function corners(string $style): self
     {
-        if (!in_array($style, ['sharp', 'rounded'], true)) {
+        if (!in_array($style, [self::CORNER_SHARP, self::CORNER_ROUNDED], true)) {
             throw new \InvalidArgumentException('Corner style must be "sharp" or "rounded"');
         }
         $this->cornerStyle = $style;
@@ -107,7 +115,7 @@ final class Panel
      */
     private function getCornerCharacters(): array
     {
-        if ($this->cornerStyle === 'rounded') {
+        if ($this->cornerStyle === self::CORNER_ROUNDED) {
             return [
                 'topLeft' => $this->roundedTopLeft,
                 'topRight' => $this->roundedTopRight,
@@ -133,7 +141,7 @@ final class Panel
             return;
         }
 
-        if ($this->layout === 'vertical') {
+        if ($this->layout === self::LAYOUT_VERTICAL) {
             $this->renderVertical();
         } else {
             $this->renderHorizontal();

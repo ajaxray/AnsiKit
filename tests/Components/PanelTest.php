@@ -19,7 +19,7 @@ final class PanelTest extends TestCase
         $block1 = (new PanelBlock())->content('Block 1')->width(20);
         $block2 = (new PanelBlock())->content('Block 2')->width(20);
         
-        $panel->layout('vertical')
+        $panel->layout(Panel::LAYOUT_VERTICAL)
             ->addBlock($block1)
             ->addBlock($block2)
             ->render();
@@ -38,7 +38,7 @@ final class PanelTest extends TestCase
         $block1 = (new PanelBlock())->content('Block 1')->width(20);
         $block2 = (new PanelBlock())->content('Block 2')->width(20);
         
-        $panel->layout('vertical')
+        $panel->layout(Panel::LAYOUT_VERTICAL)
             ->border(true)
             ->addBlock($block1)
             ->addBlock($block2)
@@ -59,7 +59,7 @@ final class PanelTest extends TestCase
         $block1 = (new PanelBlock())->content('Block 1')->width(20);
         $block2 = (new PanelBlock())->content('Block 2')->width(20);
         
-        $panel->layout('vertical')
+        $panel->layout(Panel::LAYOUT_VERTICAL)
             ->border(true)
             ->dividers(true)
             ->addBlock($block1)
@@ -80,7 +80,7 @@ final class PanelTest extends TestCase
         $block1 = (new PanelBlock())->content('Left')->width(15);
         $block2 = (new PanelBlock())->content('Right')->width(15);
         
-        $panel->layout('horizontal')
+        $panel->layout(Panel::LAYOUT_HORIZONTAL)
             ->addBlock($block1)
             ->addBlock($block2)
             ->render();
@@ -99,7 +99,7 @@ final class PanelTest extends TestCase
         $block1 = (new PanelBlock())->content('Left')->width(15);
         $block2 = (new PanelBlock())->content('Right')->width(15);
         
-        $panel->layout('horizontal')
+        $panel->layout(Panel::LAYOUT_HORIZONTAL)
             ->border(true)
             ->addBlock($block1)
             ->addBlock($block2)
@@ -119,7 +119,7 @@ final class PanelTest extends TestCase
         $block1 = (new PanelBlock())->content('Left')->width(15);
         $block2 = (new PanelBlock())->content('Right')->width(15);
         
-        $panel->layout('horizontal')
+        $panel->layout(Panel::LAYOUT_HORIZONTAL)
             ->dividers(true)
             ->addBlock($block1)
             ->addBlock($block2)
@@ -161,7 +161,7 @@ final class PanelTest extends TestCase
         $block = (new PanelBlock($writer))
             ->content('This is a very long text that should wrap')
             ->width(15)
-            ->overflow('wordwrap');
+            ->overflow(PanelBlock::OVERFLOW_WORDWRAP);
         
         $lines = $block->renderLines();
         
@@ -176,7 +176,7 @@ final class PanelTest extends TestCase
         $block1 = (new PanelBlock())->content('Small')->width(10);
         $block2 = (new PanelBlock())->content('Large')->width(30);
         
-        $panel->layout('horizontal')
+        $panel->layout(Panel::LAYOUT_HORIZONTAL)
             ->setSizes([10, 30])
             ->addBlock($block1)
             ->addBlock($block2)
@@ -209,8 +209,8 @@ final class PanelTest extends TestCase
         $panel = new Panel();
         
         // Test valid corner styles
-        $this->assertInstanceOf(Panel::class, $panel->corners('sharp'));
-        $this->assertInstanceOf(Panel::class, $panel->corners('rounded'));
+        $this->assertInstanceOf(Panel::class, $panel->corners(Panel::CORNER_SHARP));
+        $this->assertInstanceOf(Panel::class, $panel->corners(Panel::CORNER_ROUNDED));
         
         // Test invalid corner style
         $this->expectException(\InvalidArgumentException::class);
@@ -222,8 +222,8 @@ final class PanelTest extends TestCase
         $block = new PanelBlock();
         
         // Test valid corner styles
-        $this->assertInstanceOf(PanelBlock::class, $block->corners('sharp'));
-        $this->assertInstanceOf(PanelBlock::class, $block->corners('rounded'));
+        $this->assertInstanceOf(PanelBlock::class, $block->corners(Panel::CORNER_SHARP));
+        $this->assertInstanceOf(PanelBlock::class, $block->corners(Panel::CORNER_ROUNDED));
         
         // Test invalid corner style
         $this->expectException(\InvalidArgumentException::class);
@@ -237,9 +237,9 @@ final class PanelTest extends TestCase
         
         $block = (new PanelBlock())->content('Test')->width(20);
         
-        $panel->layout('vertical')
+        $panel->layout(Panel::LAYOUT_VERTICAL)
             ->border(true)
-            ->corners('rounded')
+            ->corners(Panel::CORNER_ROUNDED)
             ->addBlock($block)
             ->render();
         
@@ -264,7 +264,7 @@ final class PanelTest extends TestCase
             ->content('Test')
             ->width(20)
             ->border(true)
-            ->corners('rounded');
+            ->corners(Panel::CORNER_ROUNDED);
         
         $output = $block->render();
         
@@ -288,7 +288,7 @@ final class PanelTest extends TestCase
         
         $block = (new PanelBlock())->content('Test')->width(20);
         
-        $panel->layout('vertical')
+        $panel->layout(Panel::LAYOUT_VERTICAL)
             ->border(true)
             ->addBlock($block)
             ->render();
