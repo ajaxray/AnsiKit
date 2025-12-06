@@ -6,7 +6,7 @@ nav_order: 8
 
 # PanelBlock Component
 
-Individual content blocks that can be used standalone or within Panels. PanelBlocks implement `WriterInterface`, making them versatile containers for text or other components.
+Individual content blocks that can be used standalone or within Panels. PanelBlocks implement both `WriterInterface` and `Renderable`, making them versatile containers for text or other components that can be nested within Panels.
 
 ## Basic Usage
 
@@ -247,9 +247,11 @@ Output (with green bold text):
 
 ## Tips
 
-- Use PanelBlocks as standalone bordered containers or within Panels
-- Set `overflow('wordwrap')` for long text content
+- Use PanelBlocks as content boxes within Panels
+- PanelBlocks can also be used as standalone bordered containers
+- Set `overflow(PanelBlock::OVERFLOW_WORDWRAP)` for long text content
 - PanelBlocks automatically trim trailing newlines to prevent empty lines
 - Combine with `AnsiTerminal` styles for rich text formatting
 - Perfect for creating custom layouts by nesting components
+- PanelBlocks implement `Renderable` interface, allowing them to be nested in Panels
 - Be careful about using emoji in bordered structures, as their width can vary by terminal

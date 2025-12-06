@@ -307,4 +307,164 @@ final class PanelTest extends TestCase
         $this->assertStringNotContainsString('╰', $output);
         $this->assertStringNotContainsString('╯', $output);
     }
+
+    public function testNestedHorizontalPanelInVerticalPanel(): void
+    {
+        $writer = new MemoryWriter();
+        $mainPanel = new Panel($writer);
+        
+        // Create nested horizontal panel
+        $nestedPanel = new Panel();
+        $nestedPanel->layout(Panel::LAYOUT_HORIZONTAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('Col 1')->width(10))
+            ->addBlock((new PanelBlock())->content('Col 2')->width(10));
+        
+        // Add to main vertical panel
+        $mainPanel->layout(Panel::LAYOUT_VERTICAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('Header'))
+            ->addBlock($nestedPanel)
+            ->addBlock((new PanelBlock())->content('Footer'))
+            ->render();
+        
+        $output = $writer->getBuffer();
+        
+        // Check that all content is present
+        $this->assertStringContainsString('Header', $output);
+        $this->assertStringContainsString('Col 1', $output);
+        $this->assertStringContainsString('Col 2', $output);
+        $this->assertStringContainsString('Footer', $output);
+        
+        // Check for nested panel borders
+        $this->assertStringContainsString('┌', $output);
+        $this->assertStringContainsString('└', $output);
+    }
+
+    public function testNestedVerticalPanelsInHorizontalPanel(): void
+    {
+        $writer = new MemoryWriter();
+        $mainPanel = new Panel($writer);
+        
+        // Create nested vertical panels
+        $leftPanel = new Panel();
+        $leftPanel->layout(Panel::LAYOUT_VERTICAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('Menu')->width(10))
+            ->addBlock((new PanelBlock())->content('Home')->width(10));
+        
+        $rightPanel = new Panel();
+        $rightPanel->layout(Panel::LAYOUT_VERTICAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('Content')->width(15))
+            ->addBlock((new PanelBlock())->content('More')->width(15));
+        
+        // Add to main horizontal panel
+        $mainPanel->layout(Panel::LAYOUT_HORIZONTAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock($leftPanel)
+            ->addBlock($rightPanel)
+            ->render();
+        
+        $output = $writer->getBuffer();
+        
+        // Check that all content is present
+        $this->assertStringContainsString('Menu', $output);
+        $this->assertStringContainsString('Home', $output);
+        $this->assertStringContainsString('Content', $output);
+        $this->assertStringContainsString('More', $output);
+    }
+
+    public function testThreeLevelNestedPanels(): void
+    {
+        $writer = new MemoryWriter();
+        
+        // Level 3 - innermost panel
+        $level3 = new Panel();
+        $level3->layout(Panel::LAYOUT_HORIZONTAL)
+            ->border(true)
+            ->addBlock((new PanelBlock())->content('L3-A')->width(5))
+            ->addBlock((new PanelBlock())->content('L3-B')->width(5));
+        
+        // Level 2 - middle panel
+        $level2 = new Panel();
+        $level2->layout(Panel::LAYOUT_VERTICAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('L2 Header'))
+            ->addBlock($level3)
+            ->addBlock((new PanelBlock())->content('L2 Footer'));
+        
+        // Level 1 - outer panel
+        $level1 = new Panel($writer);
+        $level1->layout(Panel::LAYOUT_VERTICAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('L1 Top'))
+            ->addBlock($level2)
+            ->addBlock((new PanelBlock())->content('L1 Bottom'))
+            ->render();
+        
+        $output = $writer->getBuffer();
+        
+        // Check that all levels are present
+        $this->assertStringContainsString('L1 Top', $output);
+        $this->assertStringContainsString('L1 Bottom', $output);
+        $this->assertStringContainsString('L2 Header', $output);
+        $this->assertStringContainsString('L2 Footer', $output);
+        $this->assertStringContainsString('L3-A', $output);
+        $this->assertStringContainsString('L3-B', $output);
+    }
+
+    public function testNestedPanelImplementsRenderable(): void
+    {
+        $panel = new Panel();
+        $panel->layout(Panel::LAYOUT_VERTICAL)
+            ->addBlock((new PanelBlock())->content('Test')->width(10));
+        
+        // Test that Panel implements Renderable interface methods
+        $this->assertIsArray($panel->renderLines());
+        $this->assertIsInt($panel->getTotalWidth());
+        $this->assertIsInt($panel->getTotalHeight());
+        $this->assertIsInt($panel->getContentWidth());
+    }
+
+    public function testNestedPanelWidthCalculation(): void
+    {
+        // Horizontal panel width should be sum of blocks + dividers + borders
+        $panel = new Panel();
+        $panel->layout(Panel::LAYOUT_HORIZONTAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('A')->width(10))
+            ->addBlock((new PanelBlock())->content('B')->width(10))
+            ->addBlock((new PanelBlock())->content('C')->width(10));
+        
+        // Width: 10 + 10 + 10 (blocks) + 2 (dividers) = 32 content
+        // Total: 32 + 2 (borders) = 34
+        $this->assertEquals(32, $panel->getContentWidth());
+        $this->assertEquals(34, $panel->getTotalWidth());
+    }
+
+    public function testNestedPanelHeightCalculation(): void
+    {
+        // Vertical panel height should be sum of blocks + dividers + borders
+        $panel = new Panel();
+        $panel->layout(Panel::LAYOUT_VERTICAL)
+            ->border(true)
+            ->dividers(true)
+            ->addBlock((new PanelBlock())->content('A')->width(10))
+            ->addBlock((new PanelBlock())->content('B')->width(10))
+            ->addBlock((new PanelBlock())->content('C')->width(10));
+        
+        // Height: 1 + 1 + 1 (blocks) + 2 (dividers) = 5 content
+        // Total: 5 + 2 (borders) = 7
+        $this->assertEquals(5, $panel->getContentHeight());
+        $this->assertEquals(7, $panel->getTotalHeight());
+    }
 }

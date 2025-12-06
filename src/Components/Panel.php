@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Ajaxray\AnsiKit\Components;
 
 use Ajaxray\AnsiKit\AnsiTerminal;
+use Ajaxray\AnsiKit\Contracts\Renderable;
 use Ajaxray\AnsiKit\Contracts\WriterInterface;
 use Ajaxray\AnsiKit\Support\Str;
 
 /**
  * Panel component for creating flexible layouts with blocks.
  * Supports vertical (rows) and horizontal (columns) layouts with customizable sizing.
+ * Implements Renderable to allow nesting panels within other panels.
  */
-final class Panel
+final class Panel implements Renderable
 {
     // Layout constants
     public const LAYOUT_VERTICAL = 'vertical';
@@ -62,8 +64,9 @@ final class Panel
 
     /**
      * Add a block to the panel.
+     * Accepts any Renderable component (PanelBlock or nested Panel).
      */
-    public function addBlock(PanelBlock $block): self
+    public function addBlock(Renderable $block): self
     {
         $this->blocks[] = $block;
         return $this;
@@ -133,80 +136,121 @@ final class Panel
     }
 
     /**
-     * Render the panel with all blocks.
+     * Render the component as an array of lines.
+     * Each line is properly formatted and padded.
+     *
+     * @return list<string>
      */
-    public function render(): void
+    public function renderLines(): array
     {
         if (empty($this->blocks)) {
-            return;
+            return [];
         }
 
         if ($this->layout === self::LAYOUT_VERTICAL) {
-            $this->renderVertical();
+            return $this->renderVerticalLines();
         } else {
-            $this->renderHorizontal();
+            return $this->renderHorizontalLines();
         }
     }
 
     /**
-     * Render vertical layout (stacked rows).
+     * Get the total width including any borders.
      */
-    private function renderVertical(): void
+    public function getTotalWidth(): int
     {
-        $panelWidth = $this->getPanelWidth();
+        $contentWidth = $this->getContentWidth();
+        return $contentWidth + ($this->hasBorder ? 2 : 0);
+    }
+
+    /**
+     * Get the total height including any borders.
+     */
+    public function getTotalHeight(): int
+    {
+        $contentHeight = $this->getContentHeight();
+        return $contentHeight + ($this->hasBorder ? 2 : 0);
+    }
+
+    /**
+     * Render the panel with all blocks to output.
+     */
+    public function render(): void
+    {
+        $lines = $this->renderLines();
+        foreach ($lines as $line) {
+            $this->t->write($line)->newline();
+        }
+    }
+
+    /**
+     * Render vertical layout (stacked rows) as lines.
+     */
+    private function renderVerticalLines(): array
+    {
+        $lines = [];
+        $panelWidth = $this->getContentWidth();
         $corners = $this->getCornerCharacters();
         
         if ($this->hasBorder) {
-            $this->t->write($corners['topLeft'] . str_repeat('─', $panelWidth) . $corners['topRight'])->newline();
+            $lines[] = $corners['topLeft'] . str_repeat('─', $panelWidth) . $corners['topRight'];
         }
         
         foreach ($this->blocks as $index => $block) {
-            $lines = $block->renderLines();
+            $blockLines = $block->renderLines();
             
-            foreach ($lines as $line) {
-                // Pad line to panel width to ensure proper alignment
+            foreach ($blockLines as $line) {
+                // Ensure line matches panel width
                 $lineWidth = Str::visibleLength($line);
-                $paddedLine = $line . str_repeat(' ', $panelWidth - $lineWidth);
+                if ($lineWidth < $panelWidth) {
+                    $line .= str_repeat(' ', $panelWidth - $lineWidth);
+                } elseif ($lineWidth > $panelWidth) {
+                    $line = substr($line, 0, $panelWidth);
+                }
                 
                 if ($this->hasBorder) {
-                    $this->t->write('│' . $paddedLine . '│')->newline();
+                    $lines[] = '│' . $line . '│';
                 } else {
-                    $this->t->write($paddedLine)->newline();
+                    $lines[] = $line;
                 }
             }
             
             // Add divider if not last block
             if ($this->hasDividers && $index < count($this->blocks) - 1) {
                 if ($this->hasBorder) {
-                    $this->t->write('├' . str_repeat('─', $panelWidth) . '┤')->newline();
+                    $lines[] = '├' . str_repeat('─', $panelWidth) . '┤';
                 } else {
-                    $this->t->write(str_repeat('─', $panelWidth))->newline();
+                    $lines[] = str_repeat('─', $panelWidth);
                 }
             }
         }
         
         if ($this->hasBorder) {
-            $this->t->write($corners['bottomLeft'] . str_repeat('─', $panelWidth) . $corners['bottomRight'])->newline();
+            $lines[] = $corners['bottomLeft'] . str_repeat('─', $panelWidth) . $corners['bottomRight'];
         }
+        
+        return $lines;
     }
 
     /**
-     * Render horizontal layout (side-by-side columns).
+     * Render horizontal layout (side-by-side columns) as lines.
      */
-    private function renderHorizontal(): void
+    private function renderHorizontalLines(): array
     {
+        $lines = [];
         $blockWidths = $this->calculateHorizontalWidths();
-        $maxHeight = $this->getPanelHeight();
+        $maxHeight = $this->getContentHeight();
         
         // Prepare all block lines
         $allBlockLines = [];
-        foreach ($this->blocks as $block) {
-            $lines = $block->renderLines();
+        foreach ($this->blocks as $blockIdx => $block) {
+            $blockLines = $block->renderLines();
+            $blockWidth = $blockWidths[$blockIdx];
             // Pad to max height
-            while (count($lines) < $maxHeight) {
-                $lines[] = str_repeat(' ', $block->getContentWidth());
+            while (count($blockLines) < $maxHeight) {
+                $blockLines[] = str_repeat(' ', $blockWidth);
             }
-            $allBlockLines[] = $lines;
+            $allBlockLines[] = $blockLines;
         }
         
         $totalWidth = array_sum($blockWidths);
@@ -216,7 +260,7 @@ final class Panel
         
         $corners = $this->getCornerCharacters();
         if ($this->hasBorder) {
-            $this->t->write($corners['topLeft'] . str_repeat('─', $totalWidth) . $corners['topRight'])->newline();
+            $lines[] = $corners['topLeft'] . str_repeat('─', $totalWidth) . $corners['topRight'];
         }
         
         // Render each line
@@ -229,6 +273,16 @@ final class Panel
             
             foreach ($this->blocks as $blockIdx => $block) {
                 $blockLine = $allBlockLines[$blockIdx][$lineIdx] ?? str_repeat(' ', $blockWidths[$blockIdx]);
+                
+                // Ensure line matches expected width
+                $lineWidth = Str::visibleLength($blockLine);
+                $expectedWidth = $blockWidths[$blockIdx];
+                if ($lineWidth < $expectedWidth) {
+                    $blockLine .= str_repeat(' ', $expectedWidth - $lineWidth);
+                } elseif ($lineWidth > $expectedWidth) {
+                    $blockLine = substr($blockLine, 0, $expectedWidth);
+                }
+                
                 $lineContent .= $blockLine;
                 
                 // Add divider if not last block
@@ -241,36 +295,68 @@ final class Panel
                 $lineContent .= '│';
             }
             
-            $this->t->write($lineContent)->newline();
+            $lines[] = $lineContent;
         }
         
         if ($this->hasBorder) {
-            $this->t->write($corners['bottomLeft'] . str_repeat('─', $totalWidth) . $corners['bottomRight'])->newline();
+            $lines[] = $corners['bottomLeft'] . str_repeat('─', $totalWidth) . $corners['bottomRight'];
+        }
+        
+        return $lines;
+    }
+
+    /**
+     * Get the content width excluding borders.
+     * For vertical layout, returns the maximum width of all blocks.
+     * For horizontal layout, sums all block widths plus dividers.
+     */
+    public function getContentWidth(): int
+    {
+        if ($this->layout === self::LAYOUT_HORIZONTAL) {
+            $totalWidth = 0;
+            foreach ($this->blocks as $index => $block) {
+                $totalWidth += $block->getTotalWidth();
+                // Add divider width if not last block
+                if ($this->hasDividers && $index < count($this->blocks) - 1) {
+                    $totalWidth += 1;
+                }
+            }
+            return $totalWidth;
+        } else {
+            // Vertical layout: max width of all blocks
+            $maxWidth = 0;
+            foreach ($this->blocks as $block) {
+                $maxWidth = max($maxWidth, $block->getTotalWidth());
+            }
+            return $maxWidth;
         }
     }
 
     /**
-     * Get panel width for vertical layout.
+     * Get the content height excluding borders.
+     * For vertical layout, sums all block heights plus dividers.
+     * For horizontal layout, returns the maximum height of all blocks.
      */
-    private function getPanelWidth(): int
+    public function getContentHeight(): int
     {
-        $maxWidth = 0;
-        foreach ($this->blocks as $block) {
-            $maxWidth = max($maxWidth, $block->getTotalWidth());
+        if ($this->layout === self::LAYOUT_VERTICAL) {
+            $totalHeight = 0;
+            foreach ($this->blocks as $index => $block) {
+                $totalHeight += $block->getTotalHeight();
+                // Add divider height if not last block
+                if ($this->hasDividers && $index < count($this->blocks) - 1) {
+                    $totalHeight += 1;
+                }
+            }
+            return $totalHeight;
+        } else {
+            // Horizontal layout: max height of all blocks
+            $maxHeight = 0;
+            foreach ($this->blocks as $block) {
+                $maxHeight = max($maxHeight, $block->getTotalHeight());
+            }
+            return $maxHeight;
         }
-        return $maxWidth;
-    }
-
-    /**
-     * Get panel height for horizontal layout.
-     */
-    private function getPanelHeight(): int
-    {
-        $maxHeight = 0;
-        foreach ($this->blocks as $block) {
-            $maxHeight = max($maxHeight, $block->getTotalHeight());
-        }
-        return $maxHeight;
     }
 
     /**
@@ -284,7 +370,8 @@ final class Panel
             if (isset($this->sizes[$index]) && $this->sizes[$index] > 0) {
                 $widths[] = $this->sizes[$index];
             } else {
-                $widths[] = $block->getContentWidth();
+                // Use getTotalWidth for nested panels with borders
+                $widths[] = $block->getTotalWidth();
             }
         }
         

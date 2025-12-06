@@ -43,7 +43,7 @@ The output will be:
 | `border()` | `bool $enabled` | `false` | Enable/disable panel border |
 | `dividers()` | `bool $enabled`, `string $char` | `false, '│'` | Enable dividers between blocks |
 | `corners()` | `Panel::CORNER_SHARP` or `Panel::CORNER_ROUNDED` | `Panel::CORNER_SHARP` | Set corner style |
-| `addBlock()` | `PanelBlock $block` | - | Add a block to the panel |
+| `addBlock()` | `Renderable $block` | - | Add a block or nested panel to the panel |
 
 ### PanelBlock Configuration
 
@@ -271,10 +271,52 @@ Output:
 └─────────────────────────┘
 ```
 
+## Nested Panels
+
+Panels can be nested within other panels to create complex layouts. Both `Panel` and `PanelBlock` implement the `Renderable` interface, allowing them to be used interchangeably:
+
+```php
+$panel = new Panel();
+
+// Create a nested horizontal panel
+$nestedPanel = new Panel();
+$nestedPanel->layout(Panel::LAYOUT_HORIZONTAL)
+    ->border(true)
+    ->dividers(true)
+    ->addBlock((new PanelBlock())->content('Col 1')->width(15))
+    ->addBlock((new PanelBlock())->content('Col 2')->width(15))
+    ->addBlock((new PanelBlock())->content('Col 3')->width(15));
+
+// Add the nested panel to the main panel
+$panel->layout(Panel::LAYOUT_VERTICAL)
+    ->border(true)
+    ->dividers(true)
+    ->addBlock((new PanelBlock())->content('Header')->width(47))
+    ->addBlock($nestedPanel)  // Nested panel here
+    ->addBlock((new PanelBlock())->content('Footer')->width(47))
+    ->render();
+```
+
+Output:
+```terminaloutput
+┌───────────────────────────────────────────────┐
+│Header                                         │
+├───────────────────────────────────────────────┤
+│┌───────────────────────────────────────────┐ │
+││Col 1          │Col 2          │Col 3       │ │
+│└───────────────────────────────────────────┘ │
+├───────────────────────────────────────────────┤
+│Footer                                         │
+└───────────────────────────────────────────────┘
+```
+
+This allows you to create dashboard-style layouts with mixed vertical and horizontal sections.
+
 ## Tips
 
 - Panels automatically size blocks equally unless custom widths/heights are specified
 - Use `overflow('wordwrap')` for long text content
 - Panel and PanelBlock can have different corner styles
-- PanelBlocks can be nested inside other panels for complex layouts
+- Panels can be nested within other panels for complex multi-directional layouts
+- Both `Panel` and `PanelBlock` implement `Renderable` interface
 - Be careful about using emoji in bordered structures, as their width can vary by terminal

@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Ajaxray\AnsiKit\Components;
 
+use Ajaxray\AnsiKit\Contracts\Renderable;
 use Ajaxray\AnsiKit\Contracts\WriterInterface;
 use Ajaxray\AnsiKit\Support\Str;
 
 /**
- * Individual block within a Panel that implements WriterInterface.
+ * Individual block within a Panel that implements WriterInterface and Renderable.
  * Can contain text content or be used as a writer for other components.
+ * Can be nested within Panel components.
  */
-final class PanelBlock implements WriterInterface
+final class PanelBlock implements WriterInterface, Renderable
 {
     // Corner style constants
     public const CORNER_SHARP = 'sharp';
